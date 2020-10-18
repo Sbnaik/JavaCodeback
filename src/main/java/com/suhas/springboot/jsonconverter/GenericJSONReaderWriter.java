@@ -31,6 +31,8 @@ public class GenericJSONReaderWriter<T> {
             String jsonInString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonDomainClassInstance);
             objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
             return jsonInString;
+
+
         } catch (JsonProcessingException e) {
             LOGGER.error("Error while converting Object to JSON", e);
         }
@@ -47,6 +49,7 @@ public class GenericJSONReaderWriter<T> {
         System.out.println(employee.getName());
         System.out.println(employee.getAddress().getCity());
         System.out.println(employee.getPersonalInformation().getMaritialstatus());
+        System.out.println(employee.getPersonalInformation().getUtctimestamp());
 
         String outputJSON = readerWriter.convertObjectToJSON(employee);
         System.out.println(outputJSON);
@@ -68,9 +71,11 @@ public class GenericJSONReaderWriter<T> {
                 "    654321,\n" +
                 "    222333\n" +
                 "  ],\n" +
+
                 "  \"personalInformation\": {\n" +
                 "    \"gender\": \"Male\",\n" +
-                "    \"maritialstatus\": \"Married\"\n" +
+                "    \"maritialstatus\": \"Married\",\n" +
+                "    \"utctimestamp\": \"2012-04-23T18:25:43.511Z\"\n" +
                 "  }\n" +
                 "}";
     }
