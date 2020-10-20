@@ -23,6 +23,7 @@ public class PersonalInformation implements Serializable
 
     @JsonProperty("gender")
     private String gender;
+
     @JsonProperty("maritialstatus")
     private String maritialstatus;
 

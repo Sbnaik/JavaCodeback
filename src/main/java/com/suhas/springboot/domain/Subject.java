@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
     "subject"
 })
-public class Subject implements Serializable
+public class Subject implements JSONDomain, Serializable
 {
 
     @JsonProperty("subject")

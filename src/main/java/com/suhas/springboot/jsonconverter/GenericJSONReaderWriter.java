@@ -3,6 +3,9 @@ package com.suhas.springboot.jsonconverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.github.wnameless.json.flattener.JsonFlattener;
+import com.github.wnameless.json.unflattener.JsonUnflattener;
 import com.suhas.springboot.domain.Employee;
 import com.suhas.springboot.domain.JSONDomain;
 import org.slf4j.Logger;
@@ -39,19 +42,41 @@ public class GenericJSONReaderWriter<T> {
         return null;
     }
 
+    public String flattenTheJSON(
+            final String json)  {
+        String flattenedJson = JsonFlattener.flatten(json);
+        return flattenedJson;
+    }
+
+    public String unflattenTheJSON(
+            final String flattenedJson)  {
+        String nestedJson = JsonUnflattener.unflatten(flattenedJson);
+        return nestedJson;
+    }
+
     public static void main(String[] args) {
         String jsonString = getJSONString();
         GenericJSONReaderWriter<Employee> readerWriter = new GenericJSONReaderWriter<>();
 
-        Employee employee = readerWriter.convertJSONToObject(jsonString, Employee.class);
+        String flatternJSONString = readerWriter.flattenTheJSON(jsonString);
+        System.out.println(flatternJSONString);
+        Employee flattenedemployee = readerWriter.convertJSONToObject(flatternJSONString, Employee.class);
 
-        System.out.println(employee.getId());
-        System.out.println(employee.getName());
-        System.out.println(employee.getAddress().getCity());
-        System.out.println(employee.getPersonalInformation().getMaritialstatus());
-        System.out.println(employee.getPersonalInformation().getUtctimestamp());
+        System.out.println(flattenedemployee.getId());
+        System.out.println(flattenedemployee.getName());
 
-        String outputJSON = readerWriter.convertObjectToJSON(employee);
+        System.out.println(flattenedemployee.getStreet());
+        System.out.println(flattenedemployee.getCity());
+        System.out.println(flattenedemployee.getZipcode());
+
+        System.out.println(flattenedemployee.getMaritialstatus());
+        System.out.println(flattenedemployee.getUtctimestamp());
+
+        String unflatternJSONString = readerWriter.unflattenTheJSON(flatternJSONString);
+        System.out.println(unflatternJSONString);
+
+       // Employee unflattenedEmployee = readerWriter.convertJSONToObject(unflatternJSONString, Employee.class);
+        String outputJSON = readerWriter.convertObjectToJSON(flattenedemployee);
         System.out.println(outputJSON);
     }
     

@@ -1,33 +1,39 @@
 package com.suhas.springboot.jsonconverter.deserializer;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.suhas.springboot.jsonconverter.serializer.TimestampSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.suhas.springboot.domain.Subject;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.HashMap;
+import java.util.Map;
 
-public class SubjectDeserializer extends JsonSerializer<Date> {
-
-    DateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sm.SSS'Z'");
-    private static final Logger LOGGER = LoggerFactory.getLogger(TimestampSerializer.class);
-
-    {
-        dateFormat1.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
+@Slf4j
+public class SubjectDeserializer extends JsonDeserializer<Map<Integer, Subject>> {
 
     @Override
-    public void serialize(
-            Date date,
-            JsonGenerator jsonGenerator,
-            SerializerProvider serializerProvider) throws IOException {
-        String outputDateString = dateFormat1.format(date);
-        jsonGenerator.writeString(outputDateString);
+    public Map<Integer, Subject> deserialize(
+            JsonParser jsonParser,
+            DeserializationContext deserializationContext) throws IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<Integer, Subject>  subjectsMap = new HashMap<>();
+
+        if (jsonParser.getCurrentToken() == JsonToken.START_ARRAY) {
+            while(jsonParser.nextToken() != JsonToken.END_ARRAY) {
+                String subjectString = jsonParser.getValueAsString();
+                //subjectString = subjectString.replaceAll("\"","\\\"");
+                Subject subject = objectMapper.readValue(subjectString, Subject.class);
+                subjectsMap.put(subject.getSubject().getSubjectid(), subject);
+            }
+
+            return subjectsMap;
+        }
+
+        return subjectsMap;
     }
 }

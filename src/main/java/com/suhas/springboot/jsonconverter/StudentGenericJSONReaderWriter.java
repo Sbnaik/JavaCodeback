@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
-import com.suhas.springboot.domain.Employee;
 import com.suhas.springboot.domain.JSONDomain;
+import com.suhas.springboot.domain.Student;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,52 +55,26 @@ public class StudentGenericJSONReaderWriter<T> {
 
     public static void main(String[] args) {
         String jsonString = getJSONString();
-        StudentGenericJSONReaderWriter<Employee> readerWriter = new StudentGenericJSONReaderWriter<>();
+        LOGGER.info("JSON  ::" + jsonString);
 
-        String flatternJSONString = readerWriter.flattenTheJSON(jsonString);
-        System.out.println(flatternJSONString);
-        Employee flattenedemployee = readerWriter.convertJSONToObject(flatternJSONString, Employee.class);
+        StudentGenericJSONReaderWriter<Student> readerWriter = new StudentGenericJSONReaderWriter<>();
+        Student student = readerWriter.convertJSONToObject(jsonString, Student.class);
 
-        System.out.println(flattenedemployee.getId());
-        System.out.println(flattenedemployee.getName());
-
-        System.out.println(flattenedemployee.getStreet());
-        System.out.println(flattenedemployee.getCity());
-        System.out.println(flattenedemployee.getZipcode());
-
-        System.out.println(flattenedemployee.getMaritialstatus());
-        System.out.println(flattenedemployee.getUtctimestamp());
-
-        String unflatternJSONString = readerWriter.unflattenTheJSON(flatternJSONString);
-        System.out.println(unflatternJSONString);
-
-       // Employee unflattenedEmployee = readerWriter.convertJSONToObject(unflatternJSONString, Employee.class);
-        String outputJSON = readerWriter.convertObjectToJSON(flattenedemployee);
-        System.out.println(outputJSON);
+        LOGGER.info("Roll Number ::" + student.getRollnumber());
+        LOGGER.info("Name ::" + student.getName());
+        LOGGER.info("Subjects ::" + student.getSubjects());
     }
     
     private static String getJSONString() {
        return "{\n" +
-                "  \"id\": 123,\n" +
-                "  \"name\": \"Henry Smith\",\n" +
-                "  \"age\": 28,\n" +
-                "  \"salary\": 2000,\n" +
-                "  \"designation\": \"Programmer\",\n" +
-                "  \"address\": {\n" +
-                "    \"street\": \"Park Avn.\",\n" +
-                "    \"city\": \"Westchester\",\n" +
-                "    \"zipcode\": 10583\n" +
-                "  },\n" +
-                "  \"phoneNumbers\": [\n" +
-                "    654321,\n" +
-                "    222333\n" +
-                "  ],\n" +
-
-                "  \"personalInformation\": {\n" +
-                "    \"gender\": \"Male\",\n" +
-                "    \"maritialstatus\": \"Married\",\n" +
-                "    \"utctimestamp\": \"2012-04-23T18:25:43.511Z\"\n" +
-                "  }\n" +
-                "}";
+               "  \"rollnumber\": 123,\n" +
+               "  \"name\": \"Suhas Naik\",\n" +
+               "  \"age\": 32,\n" +
+               "  \"subjects\": [\n" +
+               "    \"{\\\"subject\\\":{\\\"subjectid\\\":1, \\\"subjectname\\\":\\\"Hindi\\\"}}\",\n" +
+               "    \"{\\\"subject\\\":{\\\"subjectid\\\":2, \\\"subjectname\\\":\\\"English\\\"}}\",\n" +
+               "    \"{\\\"subject\\\":{\\\"subjectid\\\":3, \\\"subjectname\\\":\\\"Unrdu\\\"}}\"\n" +
+               "  ]\n" +
+               "}";
     }
 }

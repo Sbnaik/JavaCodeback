@@ -2,6 +2,7 @@
 package com.suhas.springboot.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,17 +12,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.suhas.springboot.jsonconverter.deserializer.TimestampDeserializer;
+import com.suhas.springboot.jsonconverter.serializer.TimestampSerializer;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "id",
-    "name",
-    "age",
-    "salary",
-    "designation",
-    "address",
-    "phoneNumbers",
-    "personalInformation"
+        "id",
+        "name",
+        "age",
+        "salary",
+        "designation",
+        "phoneNumbers",
 })
 public class Employee implements JSONDomain, Serializable
 {
@@ -36,15 +39,63 @@ public class Employee implements JSONDomain, Serializable
     private Integer salary;
     @JsonProperty("designation")
     private String designation;
-    @JsonProperty("address")
-    private Address address;
+
+    @JsonProperty("address.street")
+    private String street;
+
+    @JsonProperty("address.city")
+    private String city;
+
+    @JsonProperty("address.zipcode")
+    private String zipcode;
+
     @JsonProperty("phoneNumbers")
     private List<Integer> phoneNumbers = null;
-    @JsonProperty("personalInformation")
-    private PersonalInformation personalInformation;
+
+    @JsonProperty("personalInformation.gender")
+    private String gender;
+
+    @JsonProperty("personalInformation.maritialstatus")
+    private String maritialstatus;
+
+    @JsonProperty("personalInformation.utctimestamp")
+    @JsonDeserialize(using = TimestampDeserializer.class)
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Date utctimestamp;
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
     private final static long serialVersionUID = 3516968849260107879L;
+
+    @JsonProperty("street")
+    public String getStreet() {
+        return street;
+    }
+
+    @JsonProperty("street")
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    @JsonProperty("city")
+    public String getCity() {
+        return city;
+    }
+
+    @JsonProperty("city")
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    @JsonProperty("zipcode")
+    public String getZipcode() {
+        return zipcode;
+    }
+
+    @JsonProperty("zipcode")
+    public void setZipcode(String zipcode) {
+        this.zipcode = zipcode;
+    }
 
     @JsonProperty("id")
     public Integer getId() {
@@ -96,16 +147,6 @@ public class Employee implements JSONDomain, Serializable
         this.designation = designation;
     }
 
-    @JsonProperty("address")
-    public Address getAddress() {
-        return address;
-    }
-
-    @JsonProperty("address")
-    public void setAddress(Address address) {
-        this.address = address;
-    }
-
     @JsonProperty("phoneNumbers")
     public List<Integer> getPhoneNumbers() {
         return phoneNumbers;
@@ -114,16 +155,6 @@ public class Employee implements JSONDomain, Serializable
     @JsonProperty("phoneNumbers")
     public void setPhoneNumbers(List<Integer> phoneNumbers) {
         this.phoneNumbers = phoneNumbers;
-    }
-
-    @JsonProperty("personalInformation")
-    public PersonalInformation getPersonalInformation() {
-        return personalInformation;
-    }
-
-    @JsonProperty("personalInformation")
-    public void setPersonalInformation(PersonalInformation personalInformation) {
-        this.personalInformation = personalInformation;
     }
 
     @JsonAnyGetter
@@ -136,4 +167,33 @@ public class Employee implements JSONDomain, Serializable
         this.additionalProperties.put(name, value);
     }
 
+    @JsonProperty("gender")
+    public String getGender() {
+        return gender;
+    }
+
+    @JsonProperty("gender")
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    @JsonProperty("maritialstatus")
+    public String getMaritialstatus() {
+        return maritialstatus;
+    }
+
+    @JsonProperty("maritialstatus")
+    public void setMaritialstatus(String maritialstatus) {
+        this.maritialstatus = maritialstatus;
+    }
+
+    @JsonProperty("utctimestamp")
+    public Date getUtctimestamp() {
+        return utctimestamp;
+    }
+
+    @JsonProperty("utctimestamp")
+    public void setUtctimestamp(Date utctimestamp) {
+        this.utctimestamp = utctimestamp;
+    }
 }
