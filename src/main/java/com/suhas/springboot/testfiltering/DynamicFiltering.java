@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 class FilteringCriteria implements JSONDomain {
     private String key;
@@ -80,7 +81,7 @@ public class DynamicFiltering {
 
         List<Predicate<Map.Entry<String, Object>>> allPredicates = buildPredicates();
 
-        List<Map<String, Object>> resultStudentList = new ArrayList<>();
+        /*List<Map<String, Object>> resultStudentList = new ArrayList<>();
         allPredicates.
                 stream().forEach(predicate -> {
             studentList.stream().forEach(studentListObject -> {
@@ -91,9 +92,11 @@ public class DynamicFiltering {
                          });
                     }
             );
-        });
+        });*/
 
-        // List<Map<String, Object>> resultStudentList = studentList.stream().filter(p -> p.entrySet().stream().anyMatch(compositePredicate)).collect(Collectors.toList());
+        Predicate<Map.Entry<String, Object>> compositePredicate = allPredicates.stream().reduce(w -> true, Predicate::and);
+
+        List<Map<String, Object>> resultStudentList = studentList.stream().filter(p -> p.entrySet().stream().anyMatch(compositePredicate)).collect(Collectors.toList());
 
         System.out.println(resultStudentList);
         return resultStudentList;
@@ -166,19 +169,19 @@ public class DynamicFiltering {
         LOGGER.info("JSON As List of Map   ::" + studentDetails);
 
         List<FilteringCriteria> filteringCriteria = new ArrayList<>();
-        FilteringCriteria filteringCriteria1 = new FilteringCriteria("rollnumber", 123,"equals");
-        //FilteringCriteria filteringCriteria2 = new FilteringCriteria("subject.subjectname", "Hindi", "equals");
+        //FilteringCriteria filteringCriteria1 = new FilteringCriteria("rollnumber", 123,"equals");
+        FilteringCriteria filteringCriteria2 = new FilteringCriteria("subject.subjectname", "Hindi", "equals");
         //FilteringCriteria filteringCriteria3 = new FilteringCriteria("dob", "1987-09-16T01:01:56.300Z","equals");
 
         //FilteringCriteria filteringCriteria4 = new FilteringCriteria("age", 32,"greater than");
-        //FilteringCriteria filteringCriteria4 = new FilteringCriteria("age", 32,"greater than or equals to");
+        FilteringCriteria filteringCriteria4 = new FilteringCriteria("age", 32,"greater than or equals to");
         //FilteringCriteria filteringCriteria4 = new FilteringCriteria("age", 33,"less than");
         //FilteringCriteria filteringCriteria4 = new FilteringCriteria("age", 32,"less than or equals to");
 
-        FilteringCriteria filteringCriteria5 = new FilteringCriteria("isActive", true,"equals");
+        FilteringCriteria filteringCriteria5 = new FilteringCriteria("isActive", false,"equals");
 
-        filteringCriteria.add(filteringCriteria1);
-        //filteringCriteria.add(filteringCriteria2);
+        //filteringCriteria.add(filteringCriteria1);
+        filteringCriteria.add(filteringCriteria2);
         //filteringCriteria.add(filteringCriteria3);
         //filteringCriteria.add(filteringCriteria4);
         filteringCriteria.add(filteringCriteria5);
