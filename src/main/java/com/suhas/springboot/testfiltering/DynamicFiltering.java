@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 class FilteringCriteria implements JSONDomain {
     private String key;
@@ -81,64 +80,41 @@ public class DynamicFiltering {
 
         List<Predicate<Map.Entry<String, Object>>> allPredicates = buildPredicates();
 
-        Predicate<Map.Entry<String, Object>>
-                compositePredicate = allPredicates.stream().reduce(w -> true, Predicate::and);
+        List<Map<String, Object>> resultStudentList = new ArrayList<>();
+        allPredicates.
+                stream().forEach(predicate -> {
+            studentList.stream().forEach(studentListObject -> {
+                         studentListObject.entrySet().forEach(entry -> {
+                                if(predicate.test(entry)) {
+                                    resultStudentList.add(studentListObject);
+                              };
+                         });
+                    }
+            );
+        });
 
+        // List<Map<String, Object>> resultStudentList = studentList.stream().filter(p -> p.entrySet().stream().anyMatch(compositePredicate)).collect(Collectors.toList());
 
-        List<Map<String, Object>> resultStudentList = studentList.stream().filter(p -> p.entrySet().stream().anyMatch(compositePredicate)).collect(Collectors.toList());
         System.out.println(resultStudentList);
         return resultStudentList;
-
-       /* List<Map<String, Object>> resultStudentList = new ArrayList<>();
-        for(FilteringCriteria filteringCriteria : filteringCriteriaList) {
-            String key = filteringCriteria.getKey();
-            String value = filteringCriteria.getValue().toString();
-            String operation = filteringCriteria.getOperator();
-
-            for(Map<String, Object> stringObjectMap : studentList) {
-                Boolean isFieldMatched = Boolean.FALSE;
-                for(Entry<String, Object> stringObjectEntry : stringObjectMap.entrySet()) {
-                       if(stringObjectEntry.getKey().equals(key)) {
-                            if("equals".equals(operation) && value.equals(stringObjectEntry.getValue().toString())) {
-                                isFieldMatched = Boolean.TRUE;
-                            }
-                       }
-                }
-
-                if(isFieldMatched) {
-                    resultStudentList.add(stringObjectMap);
-                }
-            }
-        }
-           System.out.println(resultStudentList);
-        */
-
     }
-
 
     /**
      * Creates a Criterion from a Predicate.
      */
     List<Predicate<Map.Entry<String, Object>>> buildPredicates() {
-
         List<Predicate<Map.Entry<String, Object>>> predicates = new ArrayList<>();
-
         for(FilteringCriteria filteringCriteria : filteringCriteriaList) {
             String key = filteringCriteria.getKey();
             Object value = filteringCriteria.getValue();
             String operation = filteringCriteria.getOperator();
 
-            Predicate<Map.Entry<String, Object>> keyPredicate = entry -> entry.getKey().equals(key);
-            Predicate<Map.Entry<String, Object>> valuePredicate = entry -> entry.getValue().toString().equals(value.toString());
-            if("equals".equals(operation)) {
-                predicates.add(keyPredicate.and(valuePredicate));
-            }
+            PredicateGenerator predicateGenerator = new PredicateGenerator();
+            Predicate<Map.Entry<String, Object>> keyPredicate = entry -> entry.getKey().contains(key);
+            Predicate<Map.Entry<String, Object>> valuePredicate = predicateGenerator.preaparePredicate(value, OperationTypes.getOperationTypes(operation));
 
-            if("not equals".equals(operation)) {
-                predicates.add(keyPredicate.and(valuePredicate).negate());
-            }
+            predicates.add(keyPredicate.and(valuePredicate));
         }
-
         return predicates;
     }
 
@@ -147,11 +123,12 @@ public class DynamicFiltering {
                 "  \"rollnumber\": 123,\n" +
                 "  \"name\": \"Suhas Naik\",\n" +
                 "  \"age\": 32,\n" +
+                "  \"isActive\": true,\n" +
+                "  \"dob\": \"1987-09-16T01:01:56.300Z\",\n" +
                 "  \"subjects\": [\n" +
                 "    \"{\\\"subject\\\":{\\\"subjectid\\\":1, \\\"subjectname\\\":\\\"Hindi\\\"}}\",\n" +
                 "    \"{\\\"subject\\\":{\\\"subjectid\\\":2, \\\"subjectname\\\":\\\"English\\\"}}\",\n" +
-                "    \"{\\\"subject\\\":{\\\"subjectid\\\":4, \\\"subjectname\\\":\\\"English\\\"}}\",\n" +
-                "    \"{\\\"subject\\\":{\\\"subjectid\\\":3, \\\"subjectname\\\":\\\"Unrdu\\\"}}\"\n" +
+                "    \"{\\\"subject\\\":{\\\"subjectid\\\":3, \\\"subjectname\\\":\\\"Urdu\\\"}}\"\n" +
                 "  ]\n" +
                 "}";
     }
@@ -162,10 +139,12 @@ public class DynamicFiltering {
 
         StudentGenericJSONReaderWriter<Student> readerWriter = new StudentGenericJSONReaderWriter<>();
         Map<String, Object> flattenedJsonAsMap = readerWriter.flattenTheJSONAsMap(jsonString);
+        LOGGER.info("Flt JSON  ::" + flattenedJsonAsMap);
 
         List<Map<String, Object>> studentDetails = new ArrayList<>();
 
         Map<String, Object> mainStudentObjectMap = new LinkedHashMap<>();
+
         for(Map.Entry<String, Object> entry : flattenedJsonAsMap.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
@@ -187,13 +166,24 @@ public class DynamicFiltering {
         LOGGER.info("JSON As List of Map   ::" + studentDetails);
 
         List<FilteringCriteria> filteringCriteria = new ArrayList<>();
-        FilteringCriteria filteringCriteria1 = new FilteringCriteria("subject.subjectname", "Hindi","equals");
-         FilteringCriteria filteringCriteria2 = new FilteringCriteria("subject.subjectname", "English", "equals");
+        FilteringCriteria filteringCriteria1 = new FilteringCriteria("rollnumber", 123,"equals");
+        //FilteringCriteria filteringCriteria2 = new FilteringCriteria("subject.subjectname", "Hindi", "equals");
+        //FilteringCriteria filteringCriteria3 = new FilteringCriteria("dob", "1987-09-16T01:01:56.300Z","equals");
+
+        //FilteringCriteria filteringCriteria4 = new FilteringCriteria("age", 32,"greater than");
+        //FilteringCriteria filteringCriteria4 = new FilteringCriteria("age", 32,"greater than or equals to");
+        //FilteringCriteria filteringCriteria4 = new FilteringCriteria("age", 33,"less than");
+        //FilteringCriteria filteringCriteria4 = new FilteringCriteria("age", 32,"less than or equals to");
+
+        FilteringCriteria filteringCriteria5 = new FilteringCriteria("isActive", true,"equals");
+
         filteringCriteria.add(filteringCriteria1);
-        filteringCriteria.add(filteringCriteria2);
+        //filteringCriteria.add(filteringCriteria2);
+        //filteringCriteria.add(filteringCriteria3);
+        //filteringCriteria.add(filteringCriteria4);
+        filteringCriteria.add(filteringCriteria5);
 
         DynamicFiltering dynamicFiltering = new DynamicFiltering(studentDetails, filteringCriteria);
         dynamicFiltering.composePredicates();
     }
-
 }
