@@ -8,6 +8,7 @@ class SpringBootSocketApplicationTests {
 
 	@Test
 	void contextLoads() {
+
 	}
 
 }
