@@ -2,10 +2,8 @@
 package com.suhas.springboot.domain;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -195,5 +193,30 @@ public class Employee implements JSONDomain, Serializable
     @JsonProperty("utctimestamp")
     public void setUtctimestamp(Date utctimestamp) {
         this.utctimestamp = utctimestamp;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Employee employee = (Employee) o;
+        return Objects.equals(id, employee.id) &&
+                Objects.equals(name, employee.name) &&
+                Objects.equals(age, employee.age) &&
+                Objects.equals(salary, employee.salary) &&
+                Objects.equals(designation, employee.designation) &&
+                Objects.equals(street, employee.street) &&
+                Objects.equals(city, employee.city) &&
+                Objects.equals(zipcode, employee.zipcode) &&
+                Objects.equals(phoneNumbers, employee.phoneNumbers) &&
+                Objects.equals(gender, employee.gender) &&
+                Objects.equals(maritialstatus, employee.maritialstatus) &&
+                Objects.equals(utctimestamp, employee.utctimestamp) &&
+                Objects.equals(additionalProperties, employee.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, age, salary, designation, street, city, zipcode, phoneNumbers, gender, maritialstatus, utctimestamp, additionalProperties);
     }
 }
