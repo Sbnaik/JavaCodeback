@@ -1,4 +1,5 @@
-package com.suhas.springboot.pagination;
+package com.suhas.springboot.test.pagination;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,23 +12,22 @@ import java.util.Map;
 public class DemoPagination {
 
     private static Integer rowLimit = 6;
-    private static List<Map<String, Object>> studentDetails = new ArrayList<>();
-
-    static {
-        for(int i=1; i<=25; i++) {
-            studentDetails.add(usingFlattenMap(i));
-        }
-    }
 
     public static void main(String[] args) throws IOException {
 
+        List<Map<String, Object>> studentDetails = new ArrayList<>();
+        for(int i=1; i<=25; i++) {
+            studentDetails.add(usingFlattenMap(i));
+        }
+
+        DemoPagination demoPagination = new DemoPagination();
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         char exitChar='y';
         do {
             System.out.println("Enter your page number you want to see :");
             Integer rowOffset = Integer.parseInt(reader.readLine());
 
-            List<Map<String, Object>> pagination = getPaginationList(rowOffset);
+            List<Map<String, Object>> pagination = demoPagination.getPaginationList(rowOffset, studentDetails);
             System.out.println("The resultant List ::" + pagination);
 
             System.out.println("Enter y to continue and any character apart from y to exit");
@@ -35,7 +35,12 @@ public class DemoPagination {
         }while(exitChar == 'y');
     }
 
-    private static List<Map<String, Object>> getPaginationList(Integer rowOffset) {
+    public List<Map<String, Object>> getPaginationList(
+            Integer rowOffset,
+            List<Map<String, Object>> studentDetails) {
+
+        List<Map<String, Object>> resultantList = new ArrayList<>();
+
         int remainingRecords =  studentDetails.size()%rowLimit;
         int numberOfPages = studentDetails.size()/rowLimit;
         if(remainingRecords > 0) {
@@ -50,7 +55,15 @@ public class DemoPagination {
             endIndex = startIndex + remainingRecords;
         }
 
-        return studentDetails.subList(startIndex, endIndex);
+        try {
+            if (studentDetails.size() > startIndex && studentDetails.size() <= endIndex) {
+                resultantList = studentDetails.subList(startIndex, endIndex);
+            }
+        }catch(ArrayIndexOutOfBoundsException exception) {
+            System.out.println("ArrayIndexOutOfBoundsException while fetching details :: ");
+        }
+
+        return resultantList;
     }
 
     private static Map<String, Object> usingFlattenMap(
