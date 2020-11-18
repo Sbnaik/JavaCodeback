@@ -1,6 +1,5 @@
 package com.suhas.springboot.sorting;
 
-import com.suhas.springboot.domain.JSONDomain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,40 +7,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
-
-class SortingCriteria implements JSONDomain {
-    private String key;
-    private String SortDirection;
-
-    public SortingCriteria(String key, String sortDirection) {
-        this.key = key;
-        SortDirection = sortDirection;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getSortDirection() {
-        return SortDirection;
-    }
-
-    public void setSortDirection(String sortDirection) {
-        SortDirection = sortDirection;
-    }
-
-    @Override
-    public String toString() {
-        return "SortingCriteria{" +
-                "key='" + key + '\'' +
-                ", SortDirection='" + SortDirection + '\'' +
-                '}';
-    }
-}
 
 public class DynamicSorting {
 
@@ -70,7 +35,7 @@ public class DynamicSorting {
                     Integer student1Value = Integer.parseInt(student1.get(sortingCriteria.getKey()).toString());
                     Integer student2Value = Integer.parseInt(student1.get(sortingCriteria.getKey()).toString());
 
-                    SortDirectionEnum sortDirectionEnum = SortDirectionEnum.getSortDirection(sortingCriteria.getSortDirection());
+                    SortDirectionEnum sortDirectionEnum = sortingCriteria.getSortDirection();
                     switch (sortDirectionEnum) {
                         case ASC:
                             return student1Value.compareTo(student2Value);
@@ -174,7 +139,7 @@ public class DynamicSorting {
 
         List<Map<String, Object>> studentDetails = new ArrayList<>();
         Map<String, Object> studentInfoMap = new LinkedHashMap<>();
-        studentInfoMap.put("rollnumber", 123);
+        studentInfoMap.put("rollnumber", 119);
         studentInfoMap.put("name", "Suhas Naik");
         studentInfoMap.put("age", 32);
         studentInfoMap.put("dob", "1987-09-16T01:01:56.300Z");
@@ -183,7 +148,7 @@ public class DynamicSorting {
         studentDetails.add(studentInfoMap);
 
         Map<String, Object> studentInfoMap2 = new LinkedHashMap<>();
-        studentInfoMap2.put("rollnumber", 123);
+        studentInfoMap2.put("rollnumber", 120);
         studentInfoMap2.put("name", "Suhas Naik");
         studentInfoMap2.put("age", 32);
         studentInfoMap2.put("dob", "1987-09-16T01:01:56.300Z");
@@ -192,8 +157,8 @@ public class DynamicSorting {
         studentDetails.add(studentInfoMap2);
 
         Map<String, Object> studentInfoMap3 = new LinkedHashMap<>();
-        studentInfoMap3.put("rollnumber", 123);
-        studentInfoMap3.put("name", "Suhas Naik");
+        studentInfoMap3.put("rollnumber", 121);
+        studentInfoMap3.put("name", "Swanand Naik");
         studentInfoMap3.put("age", 32);
         studentInfoMap3.put("dob", "1987-09-16T01:01:56.300Z");
         studentInfoMap3.put("subjectid", 2);
@@ -201,8 +166,8 @@ public class DynamicSorting {
         studentDetails.add(studentInfoMap3);
 
         Map<String, Object> studentInfoMap4 = new LinkedHashMap<>();
-        studentInfoMap4.put("rollnumber", 124);
-        studentInfoMap4.put("name", "Vikas Naik");
+        studentInfoMap4.put("rollnumber", 122);
+        studentInfoMap4.put("name", "Suhas Naik");
         studentInfoMap4.put("age", 34);
         studentInfoMap4.put("dob", "1986-03-03T01:01:56.300Z");
         studentInfoMap4.put("subjectid", 1);
@@ -210,7 +175,7 @@ public class DynamicSorting {
         studentDetails.add(studentInfoMap4);
 
         Map<String, Object> studentInfoMap5 = new LinkedHashMap<>();
-        studentInfoMap5.put("rollnumber", 124);
+        studentInfoMap5.put("rollnumber", 123);
         studentInfoMap5.put("name", "Vikas Naik");
         studentInfoMap5.put("age", 34);
         studentInfoMap5.put("dob", "1987-09-16T01:01:56.300Z");
@@ -219,8 +184,8 @@ public class DynamicSorting {
         studentDetails.add(studentInfoMap5);
 
         Map<String, Object> studentInfoMap6 = new LinkedHashMap<>();
-        studentInfoMap6.put("rollnumber", 125);
-        studentInfoMap6.put("name", "Sagar Naik");
+        studentInfoMap6.put("rollnumber", 124);
+        studentInfoMap6.put("name", "Unnati Naik");
         studentInfoMap6.put("age", 36);
         studentInfoMap6.put("dob", "1984-03-03T01:01:56.300Z");
         studentInfoMap6.put("subjectid", 1);
@@ -229,7 +194,7 @@ public class DynamicSorting {
 
         Map<String, Object> studentInfoMap7 = new LinkedHashMap<>();
         studentInfoMap7.put("rollnumber", 125);
-        studentInfoMap7.put("name", "Sagar Naik");
+        studentInfoMap7.put("name", "Kalyani Naik");
         studentInfoMap7.put("age", 36);
         studentInfoMap7.put("dob", "1984-03-03T01:01:56.300Z");
         studentInfoMap7.put("subject.subjectid", 2);
@@ -237,16 +202,39 @@ public class DynamicSorting {
         studentDetails.add(studentInfoMap7);
 
         return studentDetails;
-}
+    }
+
+    private static List<Map<String, Object>> compareTo(
+            final String key,
+            final SortDirectionEnum sortDirectionEnum,
+            final List<Map<String, Object>> studentList) {
+        return studentList.stream().sorted((stringObjectMap, t1) -> {
+            Comparable object1 = (Comparable) stringObjectMap.get(key);
+            Comparable object2 = (Comparable) t1.get(key);
+
+            if(SortDirectionEnum.ASC.equals(sortDirectionEnum)) {
+                return object1.compareTo(object2);
+            } else {
+                return object2.compareTo(object1);
+            }
+        }).collect(Collectors.toList());
+    }
 
 
     public static void main(String[] args) throws Exception{
 
         List<Map<String, Object>> studentDetails = usingFlattenMap();
 
-        SortingCriteria sortingCriteria = new SortingCriteria("rollnumber", "descending");
-        DynamicSorting dynamicSorting = new DynamicSorting(studentDetails, sortingCriteria);
-        List<Map<String, Object>> sortedStudentDetails = dynamicSorting.sort();
-        System.out.println(sortedStudentDetails);
+        //SortingCriteria sortingCriteria = new SortingCriteria("rollnumber", "descending");
+        //DynamicSorting dynamicSorting = new DynamicSorting(studentDetails, sortingCriteria);
+        //List<Map<String, Object>> sortedStudentDetails = dynamicSorting.sort();
+        //System.out.println(sortedStudentDetails);
+
+        List<Map<String, Object>> sortedStudentDetails = compareTo("rollnumber", SortDirectionEnum.DESC, studentDetails);
+        System.out.println("Sorted :: " + sortedStudentDetails);
+
+        List<Map<String, Object>> sortedStudentDetails2 = compareTo("name", SortDirectionEnum.ASC, sortedStudentDetails);
+        System.out.println("Sorted :: " + sortedStudentDetails2);
+
     }
 }
